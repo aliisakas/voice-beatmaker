@@ -1,0 +1,27 @@
+/* Убираем лишние отступы у страницы */
+body {
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background-color: #0e0e0e;
+    /* Глубокий черный */
+    color: #00ff88;
+    /* Неоновый зеленый для текста */
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#app {
+    text-align: center;
+    width: 95%;
+}
+
+canvas {
+    /* Добавляем небольшое свечение холсту */
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.1);
+    border-radius: 8px;
+    background-color: #161616;
+    cursor: crosshair;
+}
