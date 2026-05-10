@@ -67,3 +67,5 @@ const states = createStates({
         }
     }
 });
+
+module.exports.scenario = scenario;
