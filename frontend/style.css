@@ -27,6 +27,7 @@ canvas {
 }
 
 #resetBtn {
+    display: none;
     background: transparent;
     color: #ff4444; /* Красный для сброса */
     border: 1px solid #ff4444;

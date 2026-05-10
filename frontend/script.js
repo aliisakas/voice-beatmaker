@@ -119,6 +119,11 @@ async function loadSounds() {
         audioBuffers.push(audioBuffer);
     }
     console.log('Все звуки загружены!');
+
+    // Показываем кнопку очистки
+    if (resetBtn) {
+        resetBtn.style.display = 'inline-block'; 
+    }
 }
 
 function playSample(index) {
