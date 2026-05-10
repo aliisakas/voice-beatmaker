@@ -29,6 +29,8 @@ let currentStep = 0;   // Индекс текущего играющего ст�
 let bpm = 120;
 let isPlaying = true;
 
+
+
 function resizeCanvas() {
     // Делаем ширину холста 90% от ширины окна браузера
     canvas.width = window.innerWidth * 0.9;
@@ -133,6 +135,16 @@ function playSample(index) {
     source.start(0);
 }
 
+// Математическая функция для "голосового" клика
+function addInstrumentViaVoice(row, col) {
+    if (row < rows && col < cols) {
+        gridState[row][col] = true;
+        drawGrid();
+    }
+}
+
+
+
 canvas.addEventListener('click', (event) => {
     if (audioCtx.state === 'suspended') {
         audioCtx.resume();
@@ -166,6 +178,41 @@ resetBtn.addEventListener('click', () => {
 
 // Слушаем событие изменения размера окна
 window.addEventListener('resize', resizeCanvas);
+
+
+
+// Создаем переменную для ассистента заранее
+let assistant = null;
+
+// Проверяем, загрузилась ли библиотека Сбера
+if (typeof createAssistant !== 'undefined') {
+    assistant = createAssistant({
+        getState: () => ({
+            item: 'beatmaker_state'
+        }),
+    });
+    
+    // Переносим слушатель данных внутрь, чтобы он не выдавал ошибок
+    assistant.on('data', (event) => {
+        console.log('Пришло событие от ассистента:', event);
+        if (event.type === 'smart_app_data') {
+            const action = event.smart_app_data;
+            switch (action.type) {
+                case 'ADD_INSTRUMENT':
+                    addInstrumentViaVoice(action.instrument_index, action.step_index);
+                    break;
+                case 'RESET':
+                    const resetBtn = document.getElementById('resetBtn');
+                    if (resetBtn) resetBtn.click();
+                    break;
+            }
+        }
+    });
+} else {
+    console.warn("Библиотека Сбера не загружена. Голосовое управление будет доступно только в эмуляторе Studio.");
+}
+
+
 
 // Первый запуск функции при загрузке страницы
 resizeCanvas();
