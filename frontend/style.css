@@ -25,3 +25,21 @@ canvas {
     background-color: #161616;
     cursor: crosshair;
 }
+
+#resetBtn {
+    background: transparent;
+    color: #ff4444; /* Красный для сброса */
+    border: 1px solid #ff4444;
+    padding: 8px 16px;
+    margin-bottom: 20px;
+    cursor: pointer;
+    font-family: inherit;
+    border-radius: 4px;
+    transition: 0.3s;
+}
+
+#resetBtn:hover {
+    background: #ff4444;
+    color: white;
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.4);
+}
