@@ -149,21 +149,26 @@ resetBtn.addEventListener('click', () => {
 
 // Ассистент Сбера
 let assistant = null;
-if (typeof createAssistant !== 'undefined') {
-    assistant = createAssistant({ getState: () => ({ item: 'beatmaker_state' }) });
-    assistant.on('data', (event) => {
-        if (event.type === 'smart_app_data') {
-            const action = event.smart_app_data;
-            switch (action.type) {
-                case 'ADD_INSTRUMENT':
-                    addInstrumentViaVoice(action.instrument_index, action.step_index);
-                    break;
-                case 'RESET':
-                    if (resetBtn) resetBtn.click();
-                    break;
+
+function initAssistant() {
+    if (typeof createAssistant !== 'undefined') {
+        assistant = createAssistant({ getState: () => ({ item: 'beatmaker_state' }) });
+        
+        assistant.on('data', (event) => {
+            if (event.type === 'smart_app_data') {
+                const action = event.smart_app_data;
+                switch (action.type) {
+                    case 'ADD_INSTRUMENT':
+                        addInstrumentViaVoice(action.instrument_index, action.step_index);
+                        break;
+                    case 'RESET':
+                        if (resetBtn) resetBtn.click();
+                        break;
+                }
             }
-        }
-    });
+        });
+        console.log("Голосовой ассистент успешно подключен!");
+    }
 }
 
 
