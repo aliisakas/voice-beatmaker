@@ -2,6 +2,7 @@ theme: /
 
     state: Welcome
         q!: $regex</start>
+        event!: RUN_APP
         a: Привет! Я твой голосовой битмейкер. Давай создадим трек. Какую команду выполнить?
 
     state: AddInstrument
@@ -51,3 +52,7 @@ theme: /
                 }
             });
             $reactions.answer("Всё очищено!");
+
+    state: CatchAll
+        event!: noMatch
+        a: Извини, я не понял команду. Попробуй сказать "добавь бочку на пятый такт" или "очисти всё".
