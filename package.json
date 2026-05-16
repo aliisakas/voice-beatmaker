@@ -1,9 +1,0 @@
-{
-  "name": "voice-beatmaker",
-  "version": "1.0.0",
-  "main": "src/index.js",
-  "dependencies": {
-    "@salutejs/scenario": "^1.26.0",
-    "@salutejs/storage-adapter-memory": "^1.26.0"
-  }
-}

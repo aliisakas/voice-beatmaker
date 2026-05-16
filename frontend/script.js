@@ -1,4 +1,3 @@
-// Создаем аудио-контекст
 const AudioContext = window.AudioContext || window.webkitAudioContext;
 const audioCtx = new AudioContext();
 
@@ -10,92 +9,87 @@ const sounds = [
 ];
 
 const instrumentNames = ['KICK', 'SNARE', 'HI-HAT', 'CLAP'];
-const labelWidth = 80; // Ширина зоны для текста слева
-
 let audioBuffers = [];
 
-const canvas = document.getElementById('sequencerCanvas');
-const ctx = canvas.getContext('2d');
+const gridContainer = document.getElementById('sequencer-grid');
 const resetBtn = document.getElementById('resetBtn');
 
 const rows = 4;   // Kick, Snare, Hat, OpenHat
 const cols = 16;   // Такты
-const padding = 8;   // Отступ между клетками
-
-// Матрица состояний клеток
 let gridState = Array(rows).fill().map(() => Array(cols).fill(false));
+let domGrid = []; // Хранит ссылки на HTML-кнопки
 
 let currentStep = 0;   // Индекс текущего играющего столбца 0-15
 let bpm = 120;
 let isPlaying = true;
 
+// Создаем DOM сетку
+function initGrid() {
+    gridContainer.innerHTML = '';
+    domGrid = [];
 
+    for (let r = 0; r < rows; r++) {
+        // Подпись инструмента
+        const label = document.createElement('div');
+        label.className = 'instrument-label';
+        label.innerText = instrumentNames[r];
+        gridContainer.appendChild(label);
 
-function resizeCanvas() {
-    // Делаем ширину холста 90% от ширины окна браузера
-    canvas.width = window.innerWidth * 0.9;
-    canvas.height = canvas.width / 3.8;
-    drawGrid();
+        const rowElements = [];
+        for (let c = 0; c < cols; c++) {
+            const btn = document.createElement('button');
+            btn.className = 'cell';
+            btn.tabIndex = 0; // Обязательно для пульта ТВ
+            
+            // Визуально выделяем каждую 4-ю долю
+            if (c % 4 === 3) btn.classList.add('beat-start');
+
+            // Обработчик клика мышкой или пультом
+            btn.addEventListener('click', () => {
+                if (audioCtx.state === 'suspended') audioCtx.resume();
+                toggleCell(r, c);
+            });
+
+            gridContainer.appendChild(btn);
+            rowElements.push(btn);
+        }
+        domGrid.push(rowElements);
+    }
 }
 
-function drawGrid() {
-    // Вычисляем ширину и высоту клетки
-    const cellWidth = (canvas.width - labelWidth - (cols + 1) * padding) / cols;
-    const cellHeight = (canvas.height - (rows + 1) * padding) / rows;
+// Логика переключения клетки
+function toggleCell(r, c) {
+    gridState[r][c] = !gridState[r][c];
+    updateGridVisuals();
+}
 
-    // Очищаем весь холст перед отрисовкой
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // Идем по каждой строке и столбцу
+// Обновление внешнего вида кнопок
+function updateGridVisuals() {
     for (let r = 0; r < rows; r++) {
-        // Рисуем подпись строки
-        ctx.fillStyle = '#888';
-        ctx.font = '14px Courier New';
-        ctx.textAlign = 'right';
-
-        // Центрируем текст по вертикали относительно клетки
-        ctx.fillText(instrumentNames[r], labelWidth - 10, 
-            r * (cellHeight + padding) + padding + cellHeight / 2 + 5);
-        
         for (let c = 0; c < cols; c++) {
-
-            // Вычисляем координаты (x, y) для левого верхнего угла каждой клетки
-            const x = c * (cellWidth + padding) + padding + labelWidth;
-            const y = r * (cellHeight + padding) + padding;
-
+            const btn = domGrid[r][c];
+            
             if (gridState[r][c]) {
-                if (c % 4 == 3) {
-                    ctx.fillStyle = '#00e5ff';
-                } else {
-                    ctx.fillStyle = '#00ff88';
-                }
+                btn.classList.add('active');
+                if (c % 4 === 3) btn.classList.add('alt'); // Чередование цвета
             } else {
-                if (c % 4 == 3) {
-                    ctx.fillStyle = '#2a2a2a';
-                } else {
-                    ctx.fillStyle = '#1e1e1e';
-                }
+                btn.classList.remove('active', 'alt');
             }
 
-            ctx.fillRect(x, y, cellWidth, cellHeight);
-
-            // Если текущий столбец совпадает с тем, который сейчас играет
+            // Подсветка текущего шага
             if (c === currentStep) {
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                ctx.fillRect(x, y, cellWidth, cellHeight);
+                btn.classList.add('playing');
+            } else {
+                btn.classList.remove('playing');
             }
-
-            ctx.strokeStyle = '#333';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(x, y, cellWidth, cellHeight);
         }
     }
 }
 
+// Шаг секвенсора
 function nextStep() {
     if (!isPlaying) return;
 
-    // Проходим циклом по всем 4 строкам текущего столбца
     for (let r = 0; r < rows; r++) {
         if (gridState[r][currentStep] === true) {
             playSample(r);
@@ -103,14 +97,11 @@ function nextStep() {
     }
 
     currentStep = (currentStep + 1) % cols;
-
-    // Каждый раз, когда шаг меняется, перерисовываем сетку
-    drawGrid();
-
-    // Планируем следующий шаг
+    updateGridVisuals();
     setTimeout(nextStep, (60000 / bpm) / 4);
 }
 
+// Загрузка аудио
 async function loadSounds() {
     for (const url of sounds) {
         const response = await fetch(url);
@@ -144,62 +135,23 @@ function playSample(index) {
 function addInstrumentViaVoice(row, col) {
     if (row < rows && col < cols) {
         gridState[row][col] = true;
-        drawGrid();
+        updateGridVisuals();
     }
 }
 
 
-
-canvas.addEventListener('click', (event) => {
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume();
-    }
-
-    // Координаты клика
-    const rect = canvas.getBoundingClientRect();
-    const mouseX = event.clientX - rect.left;
-    const mouseY = event.clientY - rect.top;
-
-    // Размеры клетки
-    const cellWidth = (canvas.width  - labelWidth - padding * (cols + 1)) / cols;
-    const cellHeight = (canvas.height - padding * (rows + 1)) / rows;
-
-    // Вычисляем в какую строку, столбец кликнули
-    const c = Math.floor((mouseX - padding - labelWidth) / (cellWidth + padding));
-    const r = Math.floor((mouseY - padding) / (cellHeight + padding));
-
-    // Изменяем состояние клетки при клике
-    if (c >= 0 && c < cols && r >= 0 && r < rows) {
-        gridState[r][c] = !gridState[r][c];
-        drawGrid();
-    }
-})
-
 resetBtn.addEventListener('click', () => {
     // Проходим по каждой строке и заполняем её значениями false
     gridState.forEach(row => row.fill(false));
-    drawGrid();
+    updateGridVisuals();
 });
 
-// Слушаем событие изменения размера окна
-window.addEventListener('resize', resizeCanvas);
 
-
-
-// Создаем переменную для ассистента заранее
+// Ассистент Сбера
 let assistant = null;
-
-// Проверяем, загрузилась ли библиотека Сбера
 if (typeof createAssistant !== 'undefined') {
-    assistant = createAssistant({
-        getState: () => ({
-            item: 'beatmaker_state'
-        }),
-    });
-    
-    // Переносим слушатель данных внутрь, чтобы он не выдавал ошибок
+    assistant = createAssistant({ getState: () => ({ item: 'beatmaker_state' }) });
     assistant.on('data', (event) => {
-        console.log('Пришло событие от ассистента:', event);
         if (event.type === 'smart_app_data') {
             const action = event.smart_app_data;
             switch (action.type) {
@@ -207,22 +159,15 @@ if (typeof createAssistant !== 'undefined') {
                     addInstrumentViaVoice(action.instrument_index, action.step_index);
                     break;
                 case 'RESET':
-                    const resetBtn = document.getElementById('resetBtn');
                     if (resetBtn) resetBtn.click();
                     break;
             }
         }
     });
-} else {
-    console.warn("Библиотека Сбера не загружена. Голосовое управление будет доступно только в эмуляторе Studio.");
 }
 
 
-
-// Первый запуск функции при загрузке страницы
-resizeCanvas();
-
-// Запускаем цикл
+// Инициализация
+initGrid();
 nextStep();
-
 loadSounds();
