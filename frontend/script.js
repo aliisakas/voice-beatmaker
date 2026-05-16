@@ -155,8 +155,9 @@ function initAssistant() {
         assistant = createAssistant({ getState: () => ({ item: 'beatmaker_state' }) });
         
         assistant.on('data', (event) => {
-            if (event.type === 'smart_app_data') {
-                const action = event.smart_app_data;
+            const action = event.action || event.smart_app_data || event;
+            
+            if (action) {
                 switch (action.type) {
                     case 'ADD_INSTRUMENT':
                         addInstrumentViaVoice(action.instrument_index, action.step_index);
