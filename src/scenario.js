@@ -68,4 +68,10 @@ const states = createStates({
     }
 });
 
+
+const scenario = createScenarioWalker({
+    intents,
+    states
+});
+
 module.exports.scenario = scenario;
