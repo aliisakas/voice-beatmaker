@@ -1,7 +1,6 @@
 theme: /
 
     state: Welcome
-        # Ловим и системные события, и текстовые команды запуска
         q!: $regex</start>
         q!: *(запусти*|открой*|включи*|вруби*) * битмейкер*
         event!: RUN_APP
@@ -30,7 +29,7 @@ theme: /
                         items: [{
                             command: {
                                 type: "smart_app_data",
-                                smart_app_data: {
+                                action: {
                                     type: "ADD_INSTRUMENT",
                                     instrument_index: instIdx,
                                     step_index: stepIdx
@@ -54,7 +53,7 @@ theme: /
                     items: [{
                         command: {
                             type: "smart_app_data",
-                            smart_app_data: {
+                            action: {
                                 type: "RESET"
                             }
                         }
