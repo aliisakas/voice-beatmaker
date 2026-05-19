@@ -165,7 +165,9 @@ function initAssistant() {
                         addInstrumentViaVoice(action.instrument_index, action.step_index);
                         break;
                     case 'RESET':
-                        if (resetBtn) resetBtn.click();
+                        document.querySelectorAll('.cell').forEach(cell => {
+                            cell.classList.remove('active');
+                        });
                         break;
                 }
             }
