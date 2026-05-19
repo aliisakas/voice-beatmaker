@@ -7,7 +7,7 @@ theme: /
         a: Привет! Я твой голосовой битмейкер. Давай создадим трек. Какую команду выполнить?
 
     state: AddInstrument
-        q!: * (добавь*|поставь*|включи*|сделай*) * (бочк*|кик*|kick|рабоч*|снеер*|снейр*|снэр*|снер*|snare|хэт*|хайхэт*|хай-хэт*|хай хэт*|тарелк*|hihat|hi-hat|hi hat|хлопок|хлопк*|клэп*|клеп*|clap) * [на] * такт*
+        q!: * (добавь*|поставь*|включи*|сделай*) * (бочк*|кик*|kick|рабоч*|снеер*|снейр*|снэр*|снер*|snare|хэт*|хайхэт*|хай-хэт*|хай хэт*|тарелк*|hihat|hi-hat|hi hat|хлопок|хлопк*|клэп*|клеп*|clap) * [на] * так*
         script:
             var text = $request.query.toLowerCase();
             
@@ -25,31 +25,31 @@ theme: /
                 // Если Салют прислал цифрой
                 num = parseInt(match[0]);
             } else {
-                // Ищем длинные числа (11-16)
-                if (text.indexOf("одиннадцат") > -1) num = 11;
-                else if (text.indexOf("двенадцат") > -1) num = 12;
-                else if (text.indexOf("тринадцат") > -1) num = 13;
-                else if (text.indexOf("четырнадцат") > -1) num = 14;
-                else if (text.indexOf("пятнадцат") > -1) num = 15;
-                else if (text.indexOf("шестнадцат") > -1) num = 16;
-                
-                // Затем ищем короткие числа (1-10)
-                else if (text.indexOf("перв") > -1 || text.indexOf("один") > -1) num = 1;
-                else if (text.indexOf("втор") > -1 || text.indexOf("два") > -1 || text.indexOf("две") > -1) num = 2;
-                else if (text.indexOf("трет") > -1 || text.indexOf("три") > -1) num = 3;
-                else if (text.indexOf("четверт") > -1 || text.indexOf("четыр") > -1) num = 4;
-                else if (text.indexOf("пят") > -1) num = 5;
-                else if (text.indexOf("шест") > -1) num = 6;
-                else if (text.indexOf("седьм") > -1 || text.indexOf("сем") > -1) num = 7;
-                else if (text.indexOf("восьм") > -1 || text.indexOf("восем") > -1) num = 8;
-                else if (text.indexOf("девят") > -1) num = 9;
-                else if (text.indexOf("десят") > -1) num = 10;
+                if (text.match(/одиннадцат/)) num = 11;
+                else if (text.match(/двенадцат/)) num = 12;
+                else if (text.match(/тринадцат/)) num = 13;
+                else if (text.match(/четырнадцат/)) num = 14;
+                else if (text.match(/пятнадцат/)) num = 15;
+                else if (text.match(/шестнадцат/)) num = 16;
+                else if (text.match(/перв|один/)) num = 1;
+                else if (text.match(/втор|два|две/)) num = 2;
+                else if (text.match(/трет|три/)) num = 3;
+                else if (text.match(/четверт|четыр/)) num = 4;
+                else if (text.match(/пят/)) num = 5;
+                else if (text.match(/шест/)) num = 6;
+                else if (text.match(/седьм|сем/)) num = 7;
+                else if (text.match(/восьм|восем/)) num = 8;
+                else if (text.match(/девят/)) num = 9;
+                else if (text.match(/десят/)) num = 10;
             }
 
-            var stepIdx = num - 1;
+            // ЗАЩИТА ИНТЕРВАЛА
+            if (num !== -1) {
+                if (num > 16) num = 16; // Если сказали >16, ставим на 16
+                if (num < 1) num = 1;   // Защита от отрицательных
 
-            // Проверяем, что такт в рамках нашей сетки
-            if (stepIdx >= 0 && stepIdx <= 15) {
+                var stepIdx = num - 1;
+
                 $response.replies = $response.replies || [];
                 $response.replies.push({
                     type: "raw",
@@ -68,8 +68,7 @@ theme: /
                 });
                 $reactions.answer("Добавлено!");
             } else {
-                // Если ничего не распознано
-                $reactions.answer("Не расслышал номер такта. Повтори, пожалуйста, от 1 до 16.");
+                $reactions.answer("Не понял номер позиции. Пожалуйста, скажи число от 1 до 16.");
             }
 
     state: Reset

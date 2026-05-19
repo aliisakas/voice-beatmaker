@@ -165,9 +165,8 @@ function initAssistant() {
                         addInstrumentViaVoice(action.instrument_index, action.step_index);
                         break;
                     case 'RESET':
-                        document.querySelectorAll('.cell').forEach(cell => {
-                            cell.classList.remove('active');
-                        });
+                        gridState.forEach(row => row.fill(false));
+                        updateGridVisuals();
                         break;
                 }
             }
