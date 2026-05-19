@@ -50,6 +50,15 @@ function initGrid() {
                 toggleCell(r, c);
             });
 
+            btn.addEventListener('keydown', (e) => {
+                // 13 - Enter (компьютер), 23 - кнопка "ОК" (DPAD_CENTER) на пульте ТВ
+                if (e.key === 'Enter' || e.keyCode === 23 || e.keyCode === 13) {
+                    e.preventDefault();
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    toggleCell(r, c);
+                }
+            });
+
             gridContainer.appendChild(btn);
             rowElements.push(btn);
         }
@@ -144,6 +153,14 @@ resetBtn.addEventListener('click', () => {
     // Проходим по каждой строке и заполняем её значениями false
     gridState.forEach(row => row.fill(false));
     updateGridVisuals();
+});
+
+resetBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.keyCode === 23 || e.keyCode === 13) {
+        e.preventDefault();
+        gridState.forEach(row => row.fill(false));
+        updateGridVisuals();
+    }
 });
 
 
