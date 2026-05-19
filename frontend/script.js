@@ -151,13 +151,15 @@ resetBtn.addEventListener('click', () => {
 let assistant = null;
 
 function initAssistant() {
-    if (typeof createAssistant !== 'undefined') {
-        assistant = createAssistant({ getState: () => ({ item: 'beatmaker_state' }) });
+    if (window.assistant) {
+        assistant = window.assistant.createAssistant({ getState: () => ({ item: 'beatmaker_state' }) });
         
         assistant.on('data', (event) => {
-            const action = event.action || event.smart_app_data || event;
+            if (event.type === 'character' || event.type === 'insets') return;
             
-            if (action) {
+            const action = event.action; 
+            
+            if (action && action.type) {
                 switch (action.type) {
                     case 'ADD_INSTRUMENT':
                         addInstrumentViaVoice(action.instrument_index, action.step_index);
@@ -168,12 +170,14 @@ function initAssistant() {
                 }
             }
         });
-        console.log("Голосовой ассистент успешно подключен!");
+        console.log("SDK Сбера успешно подключен!");
+    } else {
+        console.error("Библиотека Салюта не загрузилась");
     }
 }
-
 
 // Инициализация
 initGrid();
 nextStep();
 loadSounds();
+initAssistant();
