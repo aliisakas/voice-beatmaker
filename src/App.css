@@ -1,0 +1,200 @@
+/* ── Переменные ──────────────────────────────────────────────────────────── */
+:root {
+  --bg:          #0f172a;
+  --surface:     #1e293b;
+  --surface-alt: #334155;
+  --accent:      #22d3ee;
+  --accent-alt:  #a3e635;
+  --text:        #f8fafc;
+  --text-muted:  #94a3b8;
+  --red:         #991b1b;
+}
+
+/* ── Обёртка приложения ──────────────────────────────────────────────────── */
+.app {
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: 'Courier New', 'Courier', monospace;
+  min-height: 100vh;
+  padding: 5vh 5vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Секвенсор ───────────────────────────────────────────────────────────── */
+.sequencer {
+  width: 100%;
+  max-width: 1400px;
+  text-align: center;
+}
+
+.sequencer__title {
+  font-size: 3rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+}
+
+/* ── Подсказки ───────────────────────────────────────────────────────────── */
+.hints {
+  background: var(--surface);
+  padding: 15px 25px;
+  border-radius: 12px;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  display: inline-block;
+}
+
+.hints span {
+  color: #5ea3d6;
+  font-weight: bold;
+}
+
+/* ── Сетка ───────────────────────────────────────────────────────────────── */
+.grid-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  margin-bottom: 2rem;
+}
+
+.grid-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 100px repeat(16, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 700px;
+}
+
+/* ── Подпись инструмента ─────────────────────────────────────────────────── */
+.instrument-label {
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  text-align: right;
+  padding-right: 12px;
+  text-transform: uppercase;
+}
+
+/* ── Клетка ──────────────────────────────────────────────────────────────── */
+.cell {
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--surface);
+  border-radius: 6px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  padding: 0;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Каждая 4-я клетка чуть светлее — визуальные «доли» */
+.cell--beat-accent {
+  background: var(--surface-alt);
+}
+
+/* Активная (включена) */
+.cell--active {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+/* Активная + чётная группа — второй цвет */
+.cell--active.cell--beat-accent {
+  background: var(--accent-alt);
+  box-shadow: 0 0 10px var(--accent-alt);
+}
+
+/* Текущий шаг воспроизведения */
+.cell--playing {
+  border-color: #ffffff;
+  filter: brightness(1.6);
+}
+
+/* Фокус (пульт / клавиатура) */
+.cell:focus-visible {
+  outline: 3px solid var(--accent-alt);
+  outline-offset: 2px;
+  transform: scale(1.12);
+  z-index: 10;
+}
+
+/* ── Кнопка «Очистить всё» ───────────────────────────────────────────────── */
+.reset-btn {
+  padding: 14px 32px;
+  font-size: 1.3rem;
+  font-family: inherit;
+  background: transparent;
+  color: var(--red);
+  border: 2px solid var(--red);
+  border-radius: 8px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+.reset-btn:hover,
+.reset-btn:focus-visible {
+  background: var(--red);
+  color: #fff;
+  box-shadow: 0 0 18px rgba(153, 27, 27, 0.4);
+  outline: none;
+}
+
+/* ── Лоадер ──────────────────────────────────────────────────────────────── */
+.loader {
+  color: var(--text-muted);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* ── Мобильная адаптация ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .app {
+    padding: 2vh 3vw;
+    justify-content: flex-start;
+  }
+
+  .sequencer__title {
+    font-size: 1.8rem;
+    margin-top: 1rem;
+  }
+
+  .hints {
+    font-size: 0.9rem;
+    padding: 10px 14px;
+  }
+
+  .grid {
+    min-width: 800px;
+    gap: 5px;
+  }
+
+  .instrument-label {
+    font-size: 0.75rem;
+  }
+
+  .reset-btn {
+    font-size: 1rem;
+    padding: 10px 20px;
+    margin-bottom: 2rem;
+  }
+}
